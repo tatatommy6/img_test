@@ -1,21 +1,21 @@
 import cv2
-from PIL import Image
+# 이미지를 불러옵니다.
+img = cv2.imread('C:/programing/imgscaleup_test/img_test/IMG_6140.jpg')
 
-# OpenCV의 DNN 모듈을 사용하여 pre-trained super-resolution 모델 로드
+
+# Super Resolution을 하기 위해 2배 확대를 위한 ESPCN 모델을 사용합니다.
 sr = cv2.dnn_superres.DnnSuperResImpl_create()
-path = "EDSR_x3.pb"  # pre-trained 모델 파일
-sr.readModel(path)
-sr.setModel("edsr", 3)  # EDSR 모델과 확대 비율 설정
+# 모델 파일의 이름을 적어주면 됩니다.
+sr.readModel('EDSR_x4.pb')
+# 모델 파일에 적힌 숫자와 일치하도록 적어줘야 합니다.
+sr.setModel("edsr",4)
+# img를 입력 받아 결과로 result1를 돌려줍니다. 
+result1 = sr.upsample(img)
+# OpenCV에서 제공하는 보간법을 사용해봅니다.
+result2 = cv2.resize(img, dsize=None, fx=2, fy=2)
 
-# 이미지를 읽고 OpenCV 형식으로 변환
-image = cv2.imread('C:/programing/imgscaleup_test/img_test/IMG_6140.jpg')
-
-# 초해상도 적용
-result = sr.upsample(image)
-
-# 결과 이미지를 저장
-cv2.imwrite('C:\programing\imgscaleup_test\img_test\IMG_6140_super_resolutioned.jpg', result)
-
-# 결과 이미지를 Pillow를 사용하여 출력
-result_image = Image.fromarray(cv2.cvtColor(result, cv2.COLOR_BGR2RGB))
-result_image.show()
+# 입력 이미지와 Super Resolution, OpenCV 보간법 적용 결과를 화면에 보여줍니다.
+cv2.imshow('origianl', img)
+cv2.imshow('result - ESPCN', result1)
+cv2.imshow('result - Opencv', result2)
+cv2.waitKey(0)
